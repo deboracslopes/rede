@@ -3,68 +3,335 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mural Anônimo</title>
+  <title>Mural Anônimo 💌</title>
   
   <!-- SDK oficial do Supabase via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <style>/* --- ADICIONAR / SUBSTITUIR NO SEU <style> --- */
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
 
-    /* Animação suave para elementos interativos */
-    * {
-      transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+    }
+
+    body { 
+      background-color: var(--bg-main); 
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      padding: 40px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      min-height: 100vh;
+    }
+
+    h1 { 
+      margin-bottom: 24px; 
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #a5b4fc 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     
-    /* Sombra e acabamento mais marcante nos cards */
-    .card, .form-card {
-      box-shadow: 5px 5px 0px #1e1c56;
+    /* Container para os botões do topo */
+    .acoes-topo {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
     }
-    
-    /* Efeito Hover nos botões principais */
-    .btn-acao:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.08);
+
+    .btn-acao {
+      border: none;
+      padding: 12px 24px;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: white;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.25);
     }
-    
-    .btn-enviar:hover, .btn-cancelar:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.05);
+
+    .btn-acao:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.39);
     }
-    
-    /* Melhor visual nos campos de texto quando focados */
-    .form-card input:focus, 
-    .form-card textarea:focus,
-    .form-comentario input:focus {
+    .btn-acao:active { transform: translateY(0); }
+
+    .btn-novo-post { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+    .btn-pesquisar { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+
+    /* Containers dinâmicos */
+    #form-container, #search-container {
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+    }
+
+    /* Estilo genérico dos cards de formulários */
+    .form-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .form-card input, .form-card textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: var(--text-main);
       outline: none;
-      border-color: #7092ff;
-      box-shadow: 0 0 0 3px rgba(112, 146, 255, 0.3);
+      transition: border-color 0.2s;
     }
-    
-    /* Efeitos na caixa do emoji e interações dos posts */
-    .emoji-box {
-      background: #ffffff;
+
+    .form-card input:focus, .form-card textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .form-card textarea { resize: vertical; min-height: 90px; }
+
+    .form-acoes {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 4px;
+    }
+
+    .btn-cancelar {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-cancelar:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+    }
+
+    .btn-enviar {
+      background: var(--success);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .btn-enviar:hover { opacity: 0.9; }
+
+    /* Feedback do Filtro Ativo */
+    .filtro-ativo {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 480px;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .btn-limpar-filtro {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    #feed { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 480px; }
+
+    /* Card da Postagem */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .emoji-box { 
+      font-size: 2rem; 
+      background: rgba(255, 255, 255, 0.05);
+      width: 54px;
+      height: 54px;
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+    }
+
+    .texto-box { 
+      font-size: 1.05rem; 
+      color: var(--text-main); 
+      line-height: 1.5;
+    }
+
+    .hashtags-box { 
+      color: #a5b4fc; 
+      font-size: 0.85rem; 
+      font-weight: 600; 
+      letter-spacing: 0.02em;
+    }
+
+    .likes-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .btn-like {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-like:hover:not(:disabled) { 
+      background: var(--danger); 
+      color: white;
+      transform: scale(1.05);
     }
     
-    /* Destaque para a lista de comentários */
+    .btn-like:disabled {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border-color: transparent;
+      cursor: not-allowed;
+    }
+
+    .comentarios-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .comentarios-box strong {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .lista-comentarios {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .lista-comentarios li {
-      border: 1px solid #1e1c56;
-      font-weight: 500;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.02);
     }
-    
-    /* Estilização da barra de rolagem */
-    ::-webkit-scrollbar {
-      width: 8px;
+
+    .form-comentario { display: flex; gap: 8px; margin-top: 4px; }
+    .form-comentario input {
+      flex: 1;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      outline: none;
     }
-    ::-webkit-scrollbar-track {
-      background: #252554;
+    .form-comentario input:focus { border-color: var(--primary); }
+    .form-comentario button {
+      padding: 8px 14px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 0.2s;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #6c93e7;
-      border-radius: 4px;
+    .form-comentario button:hover { background: var(--primary-hover); }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -73,7 +340,7 @@
   <h1>Mural Anônimo 💌</h1>
   
   <div class="acoes-topo">
-    <button class="btn-acao btn-novo-post" onclick="toggleFormulario()">+ Nova Postagem</button>
+    <button class="btn-acao btn-novo-post" onclick="toggleFormulario()">✨ Nova Postagem</button>
     <button class="btn-acao btn-pesquisar" onclick="togglePesquisa()">🔍 Pesquisar</button>
   </div>
   
@@ -121,7 +388,7 @@
         <form class="form-card" onsubmit="criarPostagem(event)">
           <input type="text" id="input-emoji" placeholder="Emoji (ex: 😍, 🚀, 🤡)" maxlength="50" required />
           <textarea id="input-texto" placeholder="O que você está pensando?" required></textarea>
-          <input type="text" id="input-hashtags" placeholder="Hashtags separadas por espaço (ex: #dev #supabase)" />
+          <input type="text" id="input-hashtags" placeholder="Hashtags (ex: #dev #supabase)" />
           
           <div class="form-acoes">
             <button type="button" class="btn-cancelar" onclick="toggleFormulario()">Cancelar</button>
@@ -141,10 +408,10 @@
 
       searchContainerEl.innerHTML = `
         <form class="form-card" onsubmit="executarPesquisa(event)">
-          <input type="text" id="input-busca-hashtag" placeholder="Digite a hashtag (ex: #dev ou dev)" required />
+          <input type="text" id="input-busca-hashtag" placeholder="Digite a hashtag (ex: #dev)" required />
           <div class="form-acoes">
             <button type="button" class="btn-cancelar" onclick="togglePesquisa()">Cancelar</button>
-            <button type="submit" class="btn-enviar" style="background:#8b5cf6;">Buscar</button>
+            <button type="submit" class="btn-enviar" style="background:var(--accent);">Buscar</button>
           </div>
         </form>
       `;
@@ -222,17 +489,16 @@
       const { data: postagens, error } = await query;
 
       if (error) {
-        feedEl.innerHTML = "<p>Erro ao carregar postagens.</p>";
+        feedEl.innerHTML = "<p style='color:var(--text-muted); text-align:center;'>Erro ao carregar postagens.</p>";
         console.error(error);
         return;
       }
 
       if (postagens.length === 0) {
-        feedEl.innerHTML = "<p>Nenhuma postagem encontrada com esses critérios.</p>";
+        feedEl.innerHTML = "<p style='color:var(--text-muted); text-align:center;'>Nenhuma postagem encontrada.</p>";
         return;
       }
 
-      // Obtém as curtidas salvas nesta máquina
       const curtidasLocais = getCurtidasLocais();
 
       feedEl.innerHTML = "";
@@ -245,30 +511,33 @@
           .map(c => `<li>${c}</li>`)
           .join("");
 
-        // Checa se o post atual já foi curtido localmente
         const jaCurtido = curtidasLocais.includes(post.id);
 
         card.innerHTML = `
-          <div class="box emoji-box">${post.emoji || '❤️'}</div>
-          <div class="box texto-box">${post.texto}</div>
-          <div class="box hashtags-box">${hashtagsTexto}</div>
+          <div class="card-header">
+            <div class="emoji-box">${post.emoji || '❤️'}</div>
+            <div style="flex: 1;">
+              <div class="texto-box">${post.texto}</div>
+              ${hashtagsTexto ? `<div class="hashtags-box">${hashtagsTexto}</div>` : ''}
+            </div>
+          </div>
           
-          <div class="box likes-box">
-            <span>❤️ ${post.likes || 0} Likes</span>
+          <div class="likes-box">
+            <span>❤️ ${post.likes || 0} Curtidas</span>
             <button 
               class="btn-like" 
               onclick="curtirPost(${post.id}, ${post.likes || 0})"
               ${jaCurtido ? 'disabled' : ''}
             >
-              ${jaCurtido ? 'Curtido' : 'Curtir'}
+              ${jaCurtido ? '❤️ Curtido' : '🤍 Curtir'}
             </button>
           </div>
 
-          <div class="box comentarios-box">
-            <strong>Comentários:</strong>
+          <div class="comentarios-box">
+            <strong>Comentários</strong>
             <ul class="lista-comentarios">${listaComentariosHTML}</ul>
             <form class="form-comentario" onsubmit="adicionarComentario(event, ${post.id}, ${JSON.stringify(post.comentarios || []).replace(/"/g, '&quot;')})">
-              <input type="text" placeholder="Comentar..." required />
+              <input type="text" placeholder="Escreva um comentário..." required />
               <button type="submit">Enviar</button>
             </form>
           </div>
@@ -279,7 +548,6 @@
     }
 
     async function curtirPost(id, likesAtuais) {
-      // Bloqueio de segurança no código antes da chamada da API
       const curtidasLocais = getCurtidasLocais();
       if (curtidasLocais.includes(id)) return;
 
@@ -289,7 +557,7 @@
         .eq("id", id);
 
       if (!error) {
-        salvarCurtidaLocal(id); // Registra a curtida no navegador do usuário
+        salvarCurtidaLocal(id);
         carregarPostagens();
       }
     }
